@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+const EVENT = 'crm:activities'
+const notify = () => window.dispatchEvent(new CustomEvent(EVENT))
+
 export function useActivities(contactId) {
   const [data, setData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -19,13 +22,14 @@ export function useActivities(contactId) {
     }
 
     fetch()
+    window.addEventListener(EVENT, fetch)
 
     const channel = supabase
       .channel('activities-' + (contactId || 'all') + '-' + Math.random())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'activities' }, fetch)
       .subscribe()
 
-    return () => { active = false; supabase.removeChannel(channel) }
+    return () => { active = false; window.removeEventListener(EVENT, fetch); supabase.removeChannel(channel) }
   }, [contactId])
 
   return { data, isLoading }
@@ -40,7 +44,7 @@ export function useCreateActivity() {
     mutate: async (activity, opts = {}) => {
       const { data, error } = await supabase.from('activities').insert(activity).select().single()
       if (error) opts.onError?.(error)
-      else opts.onSuccess?.(data)
+      else { notify(); opts.onSuccess?.(data) }
     },
     isPending: false,
   }

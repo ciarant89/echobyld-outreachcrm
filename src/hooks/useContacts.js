@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+const EVENT = 'crm:contacts'
+const notify = () => window.dispatchEvent(new CustomEvent(EVENT))
+
 const clean = (obj) => Object.fromEntries(
   Object.entries(obj).map(([k, v]) => [k, v === '' ? null : v])
 )
@@ -21,13 +24,14 @@ export function useContacts() {
     }
 
     fetch()
+    window.addEventListener(EVENT, fetch)
 
     const channel = supabase
       .channel('contacts-' + Math.random())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, fetch)
       .subscribe()
 
-    return () => { active = false; supabase.removeChannel(channel) }
+    return () => { active = false; window.removeEventListener(EVENT, fetch); supabase.removeChannel(channel) }
   }, [])
 
   return { data, isLoading }
@@ -43,7 +47,7 @@ export function useCreateContact() {
     mutate: async (contact, opts = {}) => {
       const { data, error } = await supabase.from('contacts').insert(clean(contact)).select().single()
       if (error) opts.onError?.(error)
-      else opts.onSuccess?.(data)
+      else { notify(); opts.onSuccess?.(data) }
     },
     isPending: false,
   }
@@ -54,7 +58,7 @@ export function useUpdateContact() {
     mutate: async ({ id, ...updates }, opts = {}) => {
       const { error } = await supabase.from('contacts').update(clean(updates)).eq('id', id)
       if (error) opts.onError?.(error)
-      else opts.onSuccess?.()
+      else { notify(); opts.onSuccess?.() }
     },
     isPending: false,
   }
@@ -65,7 +69,7 @@ export function useDeleteContact() {
     mutate: async (id, opts = {}) => {
       const { error } = await supabase.from('contacts').delete().eq('id', id)
       if (error) opts.onError?.(error)
-      else opts.onSuccess?.()
+      else { notify(); opts.onSuccess?.() }
     },
     isPending: false,
   }
