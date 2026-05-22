@@ -110,8 +110,8 @@ export default function Pipeline() {
       <DragDropContext onDragEnd={handleDragEnd}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${PIPELINE_STAGES.length}, minmax(160px, 1fr))`,
-          gap: 8, paddingBottom: 16,
+          gridTemplateColumns: `repeat(${PIPELINE_STAGES.length}, 1fr)`,
+          gap: 6, paddingBottom: 16,
         }}>
           {PIPELINE_STAGES.map(stage => {
             const stageDeals  = byStage[stage] ?? []
