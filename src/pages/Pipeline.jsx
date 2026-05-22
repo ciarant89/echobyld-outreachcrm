@@ -8,6 +8,7 @@ import Modal from '../components/ui/Modal'
 import DealForm from '../components/features/DealForm'
 import { useDeals, useCreateDeal, useUpdateDeal, useDeleteDeal } from '../hooks/useDeals'
 import { useContacts } from '../hooks/useContacts'
+import { useCreateActivity } from '../hooks/useActivities'
 import { fmtCurrency, fmtDateFull } from '../lib/utils'
 import { PIPELINE_STAGES, STAGE_BORDER_COLORS } from '../lib/constants'
 import { toast } from '../components/ui/Toast'
@@ -22,9 +23,19 @@ export default function Pipeline() {
 
   const { data: deals = [] }    = useDeals()
   const { data: contacts = [] } = useContacts()
-  const { mutate: createDeal }  = useCreateDeal()
-  const { mutate: updateDeal }  = useUpdateDeal()
-  const { mutate: deleteDeal }  = useDeleteDeal()
+  const { mutate: createDeal }    = useCreateDeal()
+  const { mutate: updateDeal }    = useUpdateDeal()
+  const { mutate: deleteDeal }    = useDeleteDeal()
+  const { mutate: createActivity} = useCreateActivity()
+
+  const logPipeline = (deal, body) => createActivity({
+    type: 'pipeline',
+    title: deal.title,
+    body,
+    occurred_at: new Date().toISOString(),
+    owner: 'Ciaran',
+    contact_id: deal.contact_id || null,
+  })
 
   const [showAdd, setShowAdd]   = useState(false)
   const [addStage, setAddStage] = useState('New lead')
@@ -56,12 +67,15 @@ export default function Pipeline() {
     if (!destination || source.droppableId === destination.droppableId) return
     const prevStage = source.droppableId
     const newStage  = destination.droppableId
+    const deal      = deals.find(d => d.id === draggableId)
 
-    // Optimistic update
     setLocalStages(p => ({ ...p, [draggableId]: newStage }))
 
     updateDeal({ id: draggableId, stage: newStage }, {
-      onSuccess: () => toast.success(`Moved to ${newStage}`),
+      onSuccess: () => {
+        toast.success(`Moved to ${newStage}`)
+        if (deal) logPipeline(deal, `Stage changed: ${prevStage} → ${newStage}`)
+      },
       onError: () => {
         setLocalStages(p => ({ ...p, [draggableId]: prevStage }))
         toast.error('Failed to move deal')
@@ -71,15 +85,24 @@ export default function Pipeline() {
 
   const handleAdd = (data) => {
     createDeal({ ...data, stage: addStage }, {
-      onSuccess: () => { toast.success('Deal added'); setShowAdd(false) },
-      onError:   () => toast.error('Something went wrong — please try again'),
+      onSuccess: (newDeal) => {
+        toast.success('Deal added')
+        setShowAdd(false)
+        logPipeline({ ...data, contact_id: data.contact_id || null }, `Deal created in ${addStage}`)
+      },
+      onError: () => toast.error('Something went wrong — please try again'),
     })
   }
 
   const handleUpdate = (data) => {
+    const stageChanged = data.stage && data.stage !== openDeal.stage
     updateDeal({ id: openDeal.id, ...data }, {
-      onSuccess: () => { toast.success('Deal updated'); setOpenDeal(null) },
-      onError:   () => toast.error('Something went wrong — please try again'),
+      onSuccess: () => {
+        toast.success('Deal updated')
+        if (stageChanged) logPipeline(openDeal, `Stage changed to ${data.stage}`)
+        setOpenDeal(null)
+      },
+      onError: () => toast.error('Something went wrong — please try again'),
     })
   }
 

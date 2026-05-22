@@ -13,7 +13,7 @@ import { useContacts } from '../hooks/useContacts'
 import { timeAgo } from '../lib/utils'
 import { toast } from '../components/ui/Toast'
 
-const TYPE_FILTERS = ['all', 'meeting', 'call', 'email', 'note', 'voice_note']
+const TYPE_FILTERS = ['all', 'meeting', 'call', 'email', 'note', 'voice_note', 'pipeline']
 
 export default function Meetings() {
   useEffect(() => {

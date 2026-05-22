@@ -8,7 +8,7 @@ export const PIPELINE_STAGES = [
   'New lead', 'Initial contact made', 'Contacted', 'Meeting booked', 'Proposal sent', 'Follow up', 'Closed won', 'Closed not proceeding',
 ]
 
-export const ACTIVITY_TYPES  = ['call', 'email', 'meeting', 'note', 'voice_note']
+export const ACTIVITY_TYPES  = ['call', 'email', 'meeting', 'note', 'voice_note', 'pipeline']
 export const COUNTRIES        = ['Ireland', 'UK', 'Australia', 'USA', 'Canada', 'Other']
 export const SEGMENTS         = ['Preconstruction', 'Commercial', 'Digital', 'Operations', 'Leadership', 'Other']
 export const INTEREST_LEVELS  = ['High', 'Medium', 'Low', 'Unknown']
@@ -46,6 +46,7 @@ export const ACTIVITY_STYLES = {
   meeting:    { bg: '#F3E8FF', text: '#5B1FA0', border: '#CE93D8',  label: 'Meeting'    },
   note:       { bg: '#FFF3E0', text: '#7A3800', border: '#FFB74D',  label: 'Note'       },
   voice_note: { bg: '#ADCCB7', text: '#0D1F12', border: '#60866C',  label: 'Voice note' },
+  pipeline:   { bg: '#E8F0FF', text: '#1A3A8F', border: '#B3C8F5',  label: 'Pipeline'   },
 }
 
 export const STAGE_BORDER_COLORS = {
