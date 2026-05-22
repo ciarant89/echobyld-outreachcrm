@@ -40,4 +40,34 @@ body {
 
 @media (max-width: 640px) {
   .hide-mobile { display: none !important; }
+
+  /* Extra bottom space for the fixed bottom nav */
+  main { padding-bottom: 90px !important; }
+
+  /* Tighter page padding on mobile */
+  .page-pad { padding: 14px 12px !important; }
+
+  /* Contacts — hide table, show cards */
+  .contacts-table-wrap { display: none !important; }
+  .contacts-cards-wrap { display: flex !important; }
+
+  /* Pipeline — horizontal scroll instead of grid */
+  .pipeline-board {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 12px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .pipeline-board::-webkit-scrollbar { display: none; }
+  .pipeline-col { min-width: 220px !important; flex: none !important; }
+
+  /* Contact detail — stack sidebar above timeline */
+  .detail-layout { flex-direction: column !important; }
+  .detail-sidebar { width: 100% !important; }
+
+  /* Filter chips — horizontal scroll, no wrap */
+  .filter-scroll { flex-wrap: nowrap !important; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .filter-scroll::-webkit-scrollbar { display: none; }
 }

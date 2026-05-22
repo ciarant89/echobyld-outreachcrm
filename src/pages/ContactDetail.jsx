@@ -103,7 +103,7 @@ export default function ContactDetail() {
   }
 
   return (
-    <div style={{ padding: '20px 24px' }}>
+    <div className="page-pad" style={{ padding: '20px 24px' }}>
       {/* Back button */}
       <button
         onClick={() => navigate('/contacts')}
@@ -118,10 +118,10 @@ export default function ContactDetail() {
       </button>
 
       {/* Two-column layout */}
-      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+      <div className="detail-layout" style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
 
         {/* LEFT SIDEBAR */}
-        <div style={{
+        <div className="detail-sidebar" style={{
           width: 280, flexShrink: 0,
           background: '#fff', border: '1px solid #D4E0D8',
           borderRadius: 10, padding: 24,

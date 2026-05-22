@@ -127,7 +127,7 @@ export default function Pipeline() {
   }
 
   return (
-    <div style={{ padding: '24px 24px' }}>
+    <div className="page-pad" style={{ padding: '24px 24px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0D1F12', margin: 0, fontFamily: 'Poppins, sans-serif' }}>
@@ -143,7 +143,7 @@ export default function Pipeline() {
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div style={{
+        <div className="pipeline-board" style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${PIPELINE_STAGES.length}, 1fr)`,
           gap: 6, paddingBottom: 16,
@@ -156,7 +156,7 @@ export default function Pipeline() {
             const totalCount  = isNewLead ? stageDeals.length + contactsWithoutDeals.length : stageDeals.length
 
             return (
-              <div key={stage} style={{ minWidth: 0 }}>
+              <div key={stage} className="pipeline-col" style={{ minWidth: 0 }}>
                 {/* Column header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3, padding: '0 2px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
