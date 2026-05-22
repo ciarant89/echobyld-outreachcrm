@@ -1,6 +1,7 @@
 export const CONTACT_STATUSES = [
   'New lead', 'Contacted', 'Meeting booked', 'Met',
   'Interested', 'Not interested', 'Proposal sent', 'Closed won', 'Closed lost',
+  'Not proceeding', 'Not returned',
 ]
 
 export const PIPELINE_STAGES = [
@@ -26,6 +27,8 @@ export const STATUS_STYLES = {
   'Proposal sent':  { bg: '#FFF8E1', text: '#7A5500', border: '#FFD54F' },
   'Closed won':     { bg: '#ADCCB7', text: '#0D1F12', border: '#60866C' },
   'Closed lost':    { bg: '#ECEFF1', text: '#455A64', border: '#B0BEC5' },
+  'Not proceeding': { bg: '#ECEFF1', text: '#455A64', border: '#B0BEC5' },
+  'Not returned':   { bg: '#FFF3E0', text: '#7A3800', border: '#FFB74D' },
   'Intro made':     { bg: '#E8F0FF', text: '#1A3A8F', border: '#B3C8F5' },
   'First meeting':  { bg: '#F3E8FF', text: '#5B1FA0', border: '#CE93D8' },
   'Due diligence':  { bg: '#FFF3E0', text: '#7A3800', border: '#FFB74D' },
