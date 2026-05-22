@@ -7,12 +7,17 @@ import { PIPELINE_STAGES } from '../../lib/constants'
 
 const DEFAULTS = {
   title: '', stage: 'New lead', value_eur: '',
-  currency: 'EUR', close_date: '', owner: 'Ciaran', notes: '',
+  contact_id: '', currency: 'EUR', close_date: '', owner: 'Ciaran', notes: '',
 }
 
 export default function DealForm({ initial = {}, contacts = [], onSave, onCancel, loading = false }) {
   const [form, setForm] = useState({ ...DEFAULTS, ...initial })
   const set = (field) => (val) => setForm(f => ({ ...f, [field]: val }))
+
+  const contactOptions = [
+    { value: '', label: 'No contact linked' },
+    ...contacts.map(c => ({ value: c.id, label: `${c.full_name}${c.company ? ` — ${c.company}` : ''}` })),
+  ]
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -23,6 +28,8 @@ export default function DealForm({ initial = {}, contacts = [], onSave, onCancel
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <Input label="Deal title *" value={form.title} onChange={set('title')} required placeholder="Sisk — Preconstruction Module" />
+
+      <Select label="Contact" value={form.contact_id || ''} onChange={set('contact_id')} options={contactOptions} />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <Select label="Stage" value={form.stage} onChange={set('stage')} options={PIPELINE_STAGES} />

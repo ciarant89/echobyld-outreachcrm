@@ -11,8 +11,9 @@ import LogActivityForm from '../components/features/LogActivityForm'
 import VoiceNoteRecorder from '../components/features/VoiceNoteRecorder'
 import { useContact, useUpdateContact, useDeleteContact } from '../hooks/useContacts'
 import { useActivities, useCreateActivity } from '../hooks/useActivities'
+import { useContactDeals } from '../hooks/useDeals'
 import { CONTACT_STATUSES } from '../lib/constants'
-import { fmtDateFull, isOverdue, isDueSoon } from '../lib/utils'
+import { fmtDateFull, fmtCurrency, isOverdue, isDueSoon } from '../lib/utils'
 import { toast } from '../components/ui/Toast'
 
 export default function ContactDetail() {
@@ -20,6 +21,7 @@ export default function ContactDetail() {
   const navigate = useNavigate()
   const { data: contact, isLoading } = useContact(id)
   const { data: activities = [] }    = useActivities(id)
+  const { data: deals = [] }         = useContactDeals(id)
   const { mutate: updateContact }    = useUpdateContact()
   const { mutate: deleteContact }    = useDeleteContact()
   const { mutate: createActivity }   = useCreateActivity()
@@ -256,6 +258,40 @@ export default function ContactDetail() {
         {/* RIGHT MAIN */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <VoiceNoteRecorder onSave={handleVoiceSave} />
+
+          {deals.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#4A6352', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif', marginBottom: 8 }}>
+                Deals ({deals.length})
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {deals.map(deal => (
+                  <div
+                    key={deal.id}
+                    onClick={() => navigate('/pipeline')}
+                    style={{
+                      background: '#fff', border: '1px solid #D4E0D8', borderRadius: 8,
+                      padding: '10px 14px', cursor: 'pointer', display: 'flex',
+                      alignItems: 'center', justifyContent: 'space-between',
+                      transition: 'background 0.12s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#F0F4F1'}
+                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                  >
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1F12', fontFamily: 'Poppins, sans-serif' }}>{deal.title}</div>
+                      <div style={{ fontSize: 11, color: '#4A6352', fontFamily: 'Poppins, sans-serif', marginTop: 2 }}>{deal.stage}</div>
+                    </div>
+                    {deal.value_eur > 0 && (
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#33533D', fontFamily: 'Poppins, sans-serif' }}>
+                        {fmtCurrency(deal.value_eur)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{

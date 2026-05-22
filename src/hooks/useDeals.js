@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
+export function useContactDeals(contactId) {
+  const { data: deals, isLoading } = useDeals()
+  return { data: contactId ? deals.filter(d => d.contact_id === contactId) : [], isLoading }
+}
+
 export function useDeals() {
   const [data, setData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
