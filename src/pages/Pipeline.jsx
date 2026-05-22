@@ -180,9 +180,14 @@ export default function Pipeline() {
                                   : '0 1px 4px rgba(13,31,18,0.06)',
                                 cursor: 'pointer',
                               }}>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1F12', fontFamily: 'Poppins, sans-serif', marginBottom: 6 }}>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1F12', fontFamily: 'Poppins, sans-serif', marginBottom: 4 }}>
                                   {deal.title}
                                 </div>
+                                {deal.contact_id && contacts.find(c => c.id === deal.contact_id) && (
+                                  <div style={{ fontSize: 11, color: '#60866C', fontFamily: 'Poppins, sans-serif', fontWeight: 600, marginBottom: 4 }}>
+                                    {contacts.find(c => c.id === deal.contact_id).full_name}
+                                  </div>
+                                )}
                                 {deal.value_eur > 0 && (
                                   <div style={{
                                     display: 'inline-block', background: '#E8F5E9', color: '#33533D',

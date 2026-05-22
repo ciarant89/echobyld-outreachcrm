@@ -11,7 +11,8 @@ import LogActivityForm from '../components/features/LogActivityForm'
 import VoiceNoteRecorder from '../components/features/VoiceNoteRecorder'
 import { useContact, useUpdateContact, useDeleteContact } from '../hooks/useContacts'
 import { useActivities, useCreateActivity } from '../hooks/useActivities'
-import { useContactDeals } from '../hooks/useDeals'
+import { useContactDeals, useCreateDeal } from '../hooks/useDeals'
+import DealForm from '../components/features/DealForm'
 import { CONTACT_STATUSES } from '../lib/constants'
 import { fmtDateFull, fmtCurrency, isOverdue, isDueSoon } from '../lib/utils'
 import { toast } from '../components/ui/Toast'
@@ -22,12 +23,14 @@ export default function ContactDetail() {
   const { data: contact, isLoading } = useContact(id)
   const { data: activities = [] }    = useActivities(id)
   const { data: deals = [] }         = useContactDeals(id)
+  const { mutate: createDeal }       = useCreateDeal()
   const { mutate: updateContact }    = useUpdateContact()
   const { mutate: deleteContact }    = useDeleteContact()
   const { mutate: createActivity }   = useCreateActivity()
 
   const [showEdit, setShowEdit]   = useState(false)
   const [showLog, setShowLog]     = useState(false)
+  const [showDeal, setShowDeal]   = useState(false)
   const [notes, setNotes]         = useState('')
   const [followup, setFollowup]   = useState('')
 
@@ -259,39 +262,44 @@ export default function ContactDetail() {
         <div style={{ flex: 1, minWidth: 0 }}>
           <VoiceNoteRecorder onSave={handleVoiceSave} />
 
-          {deals.length > 0 && (
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: '#4A6352', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif', marginBottom: 8 }}>
-                Deals ({deals.length})
+          <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#4A6352', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'Poppins, sans-serif' }}>
+                  Deals {deals.length > 0 ? `(${deals.length})` : ''}
+                </div>
+                <Button variant="secondary" size="sm" onClick={() => setShowDeal(true)}>+ Add deal</Button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {deals.map(deal => (
-                  <div
-                    key={deal.id}
-                    onClick={() => navigate('/pipeline')}
-                    style={{
-                      background: '#fff', border: '1px solid #D4E0D8', borderRadius: 8,
-                      padding: '10px 14px', cursor: 'pointer', display: 'flex',
-                      alignItems: 'center', justifyContent: 'space-between',
-                      transition: 'background 0.12s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#F0F4F1'}
-                    onMouseLeave={e => e.currentTarget.style.background = '#fff'}
-                  >
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1F12', fontFamily: 'Poppins, sans-serif' }}>{deal.title}</div>
-                      <div style={{ fontSize: 11, color: '#4A6352', fontFamily: 'Poppins, sans-serif', marginTop: 2 }}>{deal.stage}</div>
-                    </div>
-                    {deal.value_eur > 0 && (
-                      <div style={{ fontSize: 13, fontWeight: 700, color: '#33533D', fontFamily: 'Poppins, sans-serif' }}>
-                        {fmtCurrency(deal.value_eur)}
+              {deals.length === 0 ? (
+                <div style={{ fontSize: 12, color: '#4A6352', fontFamily: 'Poppins, sans-serif', padding: '8px 0' }}>No deals yet.</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {deals.map(deal => (
+                    <div
+                      key={deal.id}
+                      onClick={() => navigate('/pipeline')}
+                      style={{
+                        background: '#fff', border: '1px solid #D4E0D8', borderRadius: 8,
+                        padding: '10px 14px', cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'space-between',
+                        transition: 'background 0.12s',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#F0F4F1'}
+                      onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                    >
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1F12', fontFamily: 'Poppins, sans-serif' }}>{deal.title}</div>
+                        <div style={{ fontSize: 11, color: '#4A6352', fontFamily: 'Poppins, sans-serif', marginTop: 2 }}>{deal.stage}</div>
                       </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                      {deal.value_eur > 0 && (
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#33533D', fontFamily: 'Poppins, sans-serif' }}>
+                          {fmtCurrency(deal.value_eur)}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <div style={{
@@ -316,6 +324,22 @@ export default function ContactDetail() {
           <ActivityTimeline activities={activities} />
         </div>
       </div>
+
+      {showDeal && (
+        <Modal title={`Add deal — ${contact.full_name}`} onClose={() => setShowDeal(false)} width={560}>
+          <DealForm
+            initial={{ contact_id: id, title: '' }}
+            contacts={[contact]}
+            onSave={(data) => {
+              createDeal(data, {
+                onSuccess: () => { toast.success('Deal added'); setShowDeal(false) },
+                onError:   () => toast.error('Something went wrong — please try again'),
+              })
+            }}
+            onCancel={() => setShowDeal(false)}
+          />
+        </Modal>
+      )}
 
       {showEdit && (
         <Modal title="Edit contact" onClose={() => setShowEdit(false)} width={600}>
