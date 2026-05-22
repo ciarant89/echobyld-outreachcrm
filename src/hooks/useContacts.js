@@ -1,8 +1,19 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-const EVENT = 'crm:contacts'
-const notify = () => window.dispatchEvent(new CustomEvent(EVENT))
+const EVENT  = 'crm:contacts'
+const LS_KEY = 'crm:contacts:ts'
+
+// Persists across unmount/remount — set whenever a mutation fires
+let pendingRefresh = false
+
+const notify = () => {
+  pendingRefresh = true
+  window.dispatchEvent(new CustomEvent(EVENT))
+  try { localStorage.setItem(LS_KEY, String(Date.now())) } catch (_) {}
+}
+
+export { notify as notifyContacts }
 
 const clean = (obj) => Object.fromEntries(
   Object.entries(obj).map(([k, v]) => [k, v === '' ? null : v])
@@ -15,7 +26,7 @@ export function useContacts() {
   useEffect(() => {
     let active = true
 
-    const fetch = async () => {
+    const doFetch = async () => {
       const { data: rows } = await supabase
         .from('contacts')
         .select('*')
@@ -23,21 +34,36 @@ export function useContacts() {
       if (active) { setData(rows || []); setIsLoading(false) }
     }
 
-    const onVisible = () => { if (document.visibilityState === 'visible') fetch() }
+    // Fetch immediately on mount
+    doFetch()
 
-    fetch()
-    window.addEventListener(EVENT, fetch)
+    // If a mutation fired while this component was unmounted, fetch again
+    // after a short delay to guarantee we pick up the latest data
+    let refreshTimer = null
+    if (pendingRefresh) {
+      pendingRefresh = false
+      refreshTimer = setTimeout(doFetch, 400)
+    }
+
+    const onEvent   = () => doFetch()
+    const onVisible = () => { if (document.visibilityState === 'visible') doFetch() }
+    const onStorage = (e) => { if (e.key === LS_KEY) doFetch() } // cross-tab sync
+
+    window.addEventListener(EVENT, onEvent)
     document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('storage', onStorage)
 
     const channel = supabase
       .channel('contacts-' + Math.random())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, fetch)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'contacts' }, doFetch)
       .subscribe()
 
     return () => {
       active = false
-      window.removeEventListener(EVENT, fetch)
+      if (refreshTimer) clearTimeout(refreshTimer)
+      window.removeEventListener(EVENT, onEvent)
       document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('storage', onStorage)
       supabase.removeChannel(channel)
     }
   }, [])
