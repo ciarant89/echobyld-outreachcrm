@@ -5,7 +5,7 @@ export const CONTACT_STATUSES = [
 ]
 
 export const PIPELINE_STAGES = [
-  'New lead', 'Contacted', 'Meeting booked', 'Proposal sent', 'Closed won',
+  'New lead', 'Contacted', 'Meeting booked', 'Proposal sent', 'Follow up', 'Closed won',
 ]
 
 export const ACTIVITY_TYPES  = ['call', 'email', 'meeting', 'note', 'voice_note']
@@ -29,6 +29,7 @@ export const STATUS_STYLES = {
   'Closed lost':    { bg: '#ECEFF1', text: '#455A64', border: '#B0BEC5' },
   'Not proceeding': { bg: '#ECEFF1', text: '#455A64', border: '#B0BEC5' },
   'Not returned':   { bg: '#FFF3E0', text: '#7A3800', border: '#FFB74D' },
+  'Follow up':      { bg: '#E0F7FA', text: '#00596B', border: '#80DEEA' },
   'Intro made':     { bg: '#E8F0FF', text: '#1A3A8F', border: '#B3C8F5' },
   'First meeting':  { bg: '#F3E8FF', text: '#5B1FA0', border: '#CE93D8' },
   'Due diligence':  { bg: '#FFF3E0', text: '#7A3800', border: '#FFB74D' },
@@ -50,5 +51,6 @@ export const STAGE_BORDER_COLORS = {
   'Contacted':      '#60866C',
   'Meeting booked': '#CE93D8',
   'Proposal sent':  '#FFD54F',
+  'Follow up':      '#80DEEA',
   'Closed won':     '#ADCCB7',
 }
