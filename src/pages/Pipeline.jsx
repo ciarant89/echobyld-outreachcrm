@@ -37,6 +37,15 @@ export default function Pipeline() {
     contact_id: deal.contact_id || null,
   })
 
+  const logNote = (deal, notes) => createActivity({
+    type: 'note',
+    title: deal.title,
+    body: notes,
+    occurred_at: new Date().toISOString(),
+    owner: 'Ciaran',
+    contact_id: deal.contact_id || null,
+  })
+
   const [showAdd, setShowAdd]   = useState(false)
   const [addStage, setAddStage] = useState('New lead')
   const [openDeal, setOpenDeal] = useState(null)
@@ -85,10 +94,11 @@ export default function Pipeline() {
 
   const handleAdd = (data) => {
     createDeal({ ...data, stage: addStage }, {
-      onSuccess: (newDeal) => {
+      onSuccess: () => {
         toast.success('Deal added')
         setShowAdd(false)
         logPipeline({ ...data, contact_id: data.contact_id || null }, `Deal created in ${addStage}`)
+        if (data.notes?.trim()) logNote({ ...data, contact_id: data.contact_id || null }, data.notes)
       },
       onError: () => toast.error('Something went wrong — please try again'),
     })
@@ -96,10 +106,12 @@ export default function Pipeline() {
 
   const handleUpdate = (data) => {
     const stageChanged = data.stage && data.stage !== openDeal.stage
+    const notesChanged = data.notes?.trim() && data.notes !== openDeal.notes
     updateDeal({ id: openDeal.id, ...data }, {
       onSuccess: () => {
         toast.success('Deal updated')
         if (stageChanged) logPipeline(openDeal, `Stage changed to ${data.stage}`)
+        if (notesChanged) logNote(openDeal, data.notes)
         setOpenDeal(null)
       },
       onError: () => toast.error('Something went wrong — please try again'),
