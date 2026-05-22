@@ -24,15 +24,23 @@ export function useDeals() {
       if (active) { setData(rows || []); setIsLoading(false) }
     }
 
+    const onVisible = () => { if (document.visibilityState === 'visible') fetch() }
+
     fetch()
     window.addEventListener(EVENT, fetch)
+    document.addEventListener('visibilitychange', onVisible)
 
     const channel = supabase
       .channel('deals-' + Math.random())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'deals' }, fetch)
       .subscribe()
 
-    return () => { active = false; window.removeEventListener(EVENT, fetch); supabase.removeChannel(channel) }
+    return () => {
+      active = false
+      window.removeEventListener(EVENT, fetch)
+      document.removeEventListener('visibilitychange', onVisible)
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   return { data, isLoading }
