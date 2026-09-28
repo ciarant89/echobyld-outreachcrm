@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
 
 const NAV_LINKS = [
   { to: '/',          label: 'Dashboard', icon: '⊞' },
@@ -33,6 +34,15 @@ function EchoByldLogo() {
 }
 
 export default function NavBar() {
+  const { signOut } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleSignOut() {
+    if (!window.confirm('Sign out?')) return
+    await signOut()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <>
       {/* Desktop top nav */}
@@ -76,22 +86,27 @@ export default function NavBar() {
           ))}
         </div>
 
-        <div style={{
-          width: 32,
-          height: 32,
-          borderRadius: '50%',
-          background: '#33533D',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: 13,
-          fontWeight: 700,
-          color: '#fff',
-          fontFamily: 'Poppins, sans-serif',
-          border: '1.5px solid #60866C',
-        }}>
+        <button
+          onClick={handleSignOut}
+          title="Sign out"
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: '#33533D',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#fff',
+            fontFamily: 'Poppins, sans-serif',
+            border: '1.5px solid #60866C',
+            cursor: 'pointer',
+          }}
+        >
           C
-        </div>
+        </button>
       </nav>
 
       {/* Mobile bottom nav */}
