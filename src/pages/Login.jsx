@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import Card from '../components/ui/Card'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
+import EchoByldLogo from '../components/ui/EchoByldLogo'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -51,17 +52,9 @@ export default function Login() {
     }}>
       <Card style={{ width: '100%', maxWidth: 380, padding: 32 }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: '50%', background: '#33533D',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontWeight: 700, fontSize: 18, margin: '0 auto 12px',
-            border: '1.5px solid #60866C',
-          }}>
-            E
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <EchoByldLogo height={34} fill="#33533D" />
           </div>
-          <h1 style={{ fontSize: 18, fontWeight: 700, color: '#0D1F12', margin: 0 }}>
-            EchoByld CRM
-          </h1>
           <p style={{ fontSize: 13, color: '#4A6352', marginTop: 4 }}>
             Sign in to continue
           </p>
